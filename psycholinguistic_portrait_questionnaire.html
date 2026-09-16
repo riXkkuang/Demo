@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个体心理—语言画像短问卷</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eggshell: '#F7F5F0',
+                        'eggshell-card': '#FFFFFF',
+                        'eggshell-border': '#EAE5D9',
+                        sage: {
+                            50: '#F2F5F3',
+                            100: '#E1E8E4',
+                            200: '#C4D0C7',
+                            300: '#A6B8AC',
+                            600: '#6E8576',
+                            700: '#566B5E',
+                            800: '#43544A',
+                        },
+                        butter: {
+                            50: '#FDFBF0',
+                            100: '#FAF3D7',
+                            200: '#F5E6AC',
+                            300: '#EED67C',
+                            500: '#D9B845',
+                        },
+                        charcoal: '#2D3430',
+                        muted: '#7A847E'
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', '"PingFang SC"', '"Microsoft YaHei"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F7F5F0;
+            color: #2D3430;
+            font-family: 'Plus Jakarta Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-image: radial-gradient(#E8E3D7 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+        }
+
+        .serif-title {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        /* Custom rating radio button styles */
+        .rating-btn input:checked + label {
+            background-color: #6E8576;
+            color: #FFFFFF;
+            border-color: #6E8576;
+            box-shadow: 0 4px 12px rgba(110, 133, 118, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Unanswered question highlight animation */
+        .incomplete-highlight {
+            border-color: #EF4444 !important;
+            background-color: #FEF2F2 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F7F5F0;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #C4D0C7;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 md:py-14 px-4 sm:px-6 lg:px-8">
+
+    <div id="toast" class="fixed top-6 right-6 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 ease-in-out bg-charcoal text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center space-x-3 border border-sage-600 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-circle-exclamation text-amber-400 text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">请完成所有必填题目后再提交</span>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+        
+        <header class="mb-10 text-center relative">
+            <div class="inline-block mb-3 px-3.5 py-1 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold tracking-widest uppercase border border-sage-300">
+                Psycho-Linguistic Assessment
+            </div>
+            <!-- Header Title: strictly preserved as requested -->
+            <h1 class="serif-title text-3xl md:text-5xl font-bold tracking-tight text-charcoal mb-4">
+                个体心理—语言画像短问卷
+            </h1>
+            <div class="w-16 h-0.5 bg-sage-600 mx-auto mb-6"></div>
+            
+            <!-- Rating Instruction Scale Header -->
+            <div class="bg-eggshell-card rounded-2xl p-5 md:p-6 shadow-sm border border-eggshell-border max-w-2xl mx-auto text-left relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-sage-600"></div>
+                <div class="flex items-start space-x-3 mb-3">
+                    <i class="fa-regular fa-compass text-sage-600 text-lg mt-0.5"></i>
+                    <div>
+                        <h2 class="font-semibold text-charcoal text-base">作答说明</h2>
+                        <p class="text-xs text-muted mt-0.5">请按你长期、典型的状态作答，而非最近几天的特殊状态。</p>
+                    </div>
+                </div>
+                <!-- Scale Grid -->
+                <div class="grid grid-cols-7 gap-1 md:gap-2 mt-4 text-center">
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">1</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">非常不同意</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">2</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">比较不同意</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">3</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">有些不同意</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">4</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">不确定/视情况</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">5</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">有些同意</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">6</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">比较同意</span>
+                    </div>
+                    <div class="bg-eggshell p-1.5 md:p-2 rounded-lg text-xs">
+                        <span class="block font-bold text-sage-800">7</span>
+                        <span class="text-[10px] text-muted scale-90 block tracking-tighter">非常同意</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <form id="questionnaire-form" onsubmit="event.preventDefault();" class="space-y-8">
+
+            <!-- SECTION 1 -->
+            <section id="section-1" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">一、概念探索与抽象倾向</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-1-counter">0</span> / 5 完成
+                    </div>
+                </div>
+                <div class="space-y-6" id="q-container-1"></div>
+            </section>
+
+            <!-- SECTION 2 -->
+            <section id="section-2" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">二、不确定性容纳与认知灵活性</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-2-counter">0</span> / 5 完成
+                    </div>
+                </div>
+                <div class="space-y-6" id="q-container-2"></div>
+            </section>
+
+            <!-- SECTION 3 -->
+            <section id="section-3" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">三、反思性监控</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-3-counter">0</span> / 5 完成
+                    </div>
+                </div>
+                <div class="space-y-6" id="q-container-3"></div>
+            </section>
+
+            <!-- SECTION 4 -->
+            <section id="section-4" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">四、自主性与边界</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-4-counter">0</span> / 5 完成
+                    </div>
+                </div>
+                <div class="space-y-6" id="q-container-4"></div>
+            </section>
+
+            <!-- SECTION 5: Single Behavioral Cues -->
+            <section id="section-5" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">五、单项行为线索</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-5-counter">0</span> / 4 完成
+                    </div>
+                </div>
+                <div class="space-y-6" id="q-container-5"></div>
+            </section>
+
+            <!-- SECTION 6: Open-ended Language Tasks -->
+            <section id="section-6" class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border transition-all duration-200">
+                <div class="flex items-center justify-between pb-4 mb-6 border-b border-eggshell-border">
+                    <div class="flex items-center space-x-3">
+                        <span class="serif-title text-lg md:text-xl font-bold text-sage-800">六、开放式语言任务</span>
+                    </div>
+                    <div class="sec-counter px-3 py-1 rounded-full text-xs font-semibold bg-butter-100 text-amber-800 border border-butter-300">
+                        <span id="sec-6-counter">0</span> / 4 完成
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- O1 -->
+                    <div id="q-box-o1" class="q-card p-4 rounded-xl transition-all duration-200 hover:bg-eggshell/50 border border-transparent">
+                        <label for="input-o1" class="block text-sm md:text-base font-medium text-charcoal mb-2">
+                            <span class="font-bold text-sage-700">O1.</span> 描述一件最近让你重新理解某件事的小事件。写下：最初你怎样理解它，后来又怎样理解它。
+                        </label>
+                        <textarea id="input-o1" rows="3" class="open-input w-full p-3.5 bg-eggshell/60 border border-eggshell-border rounded-xl focus:ring-2 focus:ring-sage-600 focus:bg-white text-sm transition-all" placeholder="请在此输入你的回答..."></textarea>
+                    </div>
+
+                    <!-- O2 -->
+                    <div id="q-box-o2" class="q-card p-4 rounded-xl transition-all duration-200 hover:bg-eggshell/50 border border-transparent">
+                        <label for="input-o2" class="block text-sm md:text-base font-medium text-charcoal mb-2">
+                            <span class="font-bold text-sage-700">O2.</span> 一个你在意的人突然明显冷淡，却没有解释原因。请写下最先出现的三到五个念头。
+                        </label>
+                        <textarea id="input-o2" rows="3" class="open-input w-full p-3.5 bg-eggshell/60 border border-eggshell-border rounded-xl focus:ring-2 focus:ring-sage-600 focus:bg-white text-sm transition-all" placeholder="例如：1. 我是不是说错什么了；2. 他今天心情不好..."></textarea>
+                    </div>
+
+                    <!-- O3 -->
+                    <div id="q-box-o3" class="q-card p-4 rounded-xl transition-all duration-200 hover:bg-eggshell/50 border border-transparent">
+                        <label for="input-o3" class="block text-sm md:text-base font-medium text-charcoal mb-2">
+                            <span class="font-bold text-sage-700">O3.</span> 描述一个你觉得“漂亮”的空间、物品、画面或场景，并说明它为什么漂亮。
+                        </label>
+                        <textarea id="input-o3" rows="3" class="open-input w-full p-3.5 bg-eggshell/60 border border-eggshell-border rounded-xl focus:ring-2 focus:ring-sage-600 focus:bg-white text-sm transition-all" placeholder="请具体描述画面与原因..."></textarea>
+                    </div>
+
+                    <!-- O4 -->
+                    <div id="q-box-o4" class="q-card p-4 rounded-xl transition-all duration-200 hover:bg-eggshell/50 border border-transparent">
+                        <label for="input-o4" class="block text-sm md:text-base font-medium text-charcoal mb-2">
+                            <span class="font-bold text-sage-700">O4.</span> 有人对你说：“人没必要想那么多，开心就好了。”请写出你自然会作出的回复。
+                        </label>
+                        <textarea id="input-o4" rows="3" class="open-input w-full p-3.5 bg-eggshell/60 border border-eggshell-border rounded-xl focus:ring-2 focus:ring-sage-600 focus:bg-white text-sm transition-all" placeholder="请写下你的自然回复..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pt-4 pb-12 text-center">
+                <button type="button" id="submit-btn" onclick="handleFormSubmission()" class="w-full sm:w-auto px-10 py-4 bg-sage-600 hover:bg-sage-700 text-white font-semibold text-base rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center mx-auto space-x-2">
+                    <span>生成心理—语言画像报告</span>
+                    <i class="fa-solid fa-sparkles text-butter-300"></i>
+                </button>
+                <p class="text-xs text-muted mt-3">提交后系统将即时进行计算与文本解析，生成个性化心理—语言报告</p>
+            </div>
+        </form>
+
+        <!-- Results Section (Hidden by default, displayed on submission) -->
+        <div id="result-container" class="hidden space-y-8 animate-fade-in">
+
+            <!-- Title & Overview Card -->
+            <div class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sage-600 via-butter-300 to-sage-800"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 rounded-full bg-sage-100 text-sage-800 text-xs font-semibold tracking-wider">
+                        REPORT SUMMARY
+                    </span>
+                    <span class="text-xs text-muted" id="report-date"></span>
+                </div>
+
+                <h2 class="serif-title text-2xl md:text-3xl font-bold text-charcoal mb-3">
+                    心理—语言画像诊断评估
+                </h2>
+                
+                <!-- Customized Witty Summary Verdict -->
+                <div class="mt-4 p-5 rounded-xl bg-butter-50 border border-butter-200 flex items-start space-x-4">
+                    <div class="p-3 bg-butter-200 rounded-lg text-amber-800 shrink-0 mt-0.5">
+                        <i class="fa-solid fa-quote-left text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-charcoal text-base mb-1" id="witty-title">画像分析概述</h4>
+                        <p id="witty-summary" class="text-sm text-charcoal/80 leading-relaxed font-serif italic"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. Four Core Descriptive Indices -->
+            <div class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border">
+                <h3 class="serif-title text-xl font-bold text-sage-800 mb-6 flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-radar text-sage-600"></i>
+                    <span>一、四个核心描述性指数 (1 - 7分)</span>
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="indices-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- 2. Single Behavioral Cues Section -->
+            <div class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border">
+                <h3 class="serif-title text-xl font-bold text-sage-800 mb-6 flex items-center space-x-2">
+                    <i class="fa-solid fa-feather-pointed text-sage-600"></i>
+                    <span>二、单项行为线索得分与解析</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="behavioral-cues-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- 3. Open-ended Text Analysis Section -->
+            <div class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-eggshell-border">
+                <h3 class="serif-title text-xl font-bold text-sage-800 mb-6 flex items-center space-x-2">
+                    <i class="fa-solid fa-cube text-sage-600"></i>
+                    <span>三、开放式语言任务特征分析</span>
+                </h3>
+                <div class="space-y-4" id="open-text-analysis-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- 4. AI Persona & Prompt Export Block -->
+            <div class="bg-eggshell-card rounded-2xl p-6 md:p-8 shadow-sm border border-sage-300 relative bg-gradient-to-br from-white via-sage-50/30 to-butter-50/30">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="serif-title text-xl font-bold text-sage-800 flex items-center space-x-2">
+                        <i class="fa-solid fa-robot text-sage-600"></i>
+                        <span>四、受试者 AI 画像与提示词配置</span>
+                    </h3>
+                    <button onclick="copyAiPrompt()" class="px-3.5 py-1.5 bg-sage-600 hover:bg-sage-700 text-white rounded-lg text-xs font-medium shadow transition-all flex items-center space-x-1">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>复制提示词</span>
+                    </button>
+                </div>
+
+                <div class="p-4 bg-white rounded-xl border border-eggshell-border shadow-inner text-xs font-mono text-charcoal leading-relaxed whitespace-pre-wrap select-all custom-scrollbar max-h-72 overflow-y-auto" id="ai-prompt-box">
+                    <!-- Populated dynamically -->
+                </div>
+                <p class="text-[11px] text-muted mt-2.5 flex items-center space-x-1">
+                    <i class="fa-solid fa-circle-info text-sage-600"></i>
+                    <span>可将上述系统提示词直接复制并发送给 ChatGPT / Claude / Gemini，使其调整语气偏好与互动风格。</span>
+                </p>
+            </div>
+
+            <!-- Retake Button -->
+            <div class="text-center pt-4">
+                <button onclick="resetForm()" class="px-6 py-2.5 bg-eggshell text-sage-800 font-medium text-sm rounded-xl border border-sage-300 hover:bg-sage-100 transition-all">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i>重新填写问卷
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Question Data Definitions
+        const ratingQuestions = [
+            // Section 1
+            { id: 1, section: 1, text: "1. 我会自然地思考日常事件背后可能存在的模式或意义。" },
+            { id: 2, section: 1, text: "2. 我喜欢接触与自己原有看法不同的思想或解释。" },
+            { id: 3, section: 1, text: "3. 我通常不满足于对复杂问题的单一解释。" },
+            { id: 4, section: 1, text: "4. 我容易从具体经历联想到更广泛的心理、社会或哲学问题。" },
+            { id: 5, section: 1, text: "5. 即使暂时没有实际用途，我也愿意探索新概念。" },
+            
+            // Section 2
+            { id: 6, section: 2, text: "6. 一个问题长期没有明确答案时，我会感到不舒服。", reverse: true },
+            { id: 7, section: 2, text: "7. 我倾向于尽快确定一个答案，而不是保留疑问。", reverse: true },
+            { id: 8, section: 2, text: "8. 我能接受同一件事暂时存在几种合理解释。" },
+            { id: 9, section: 2, text: "9. 在信息不足时，我可以先保留判断。" },
+            { id: 10, section: 2, text: "10. 模糊或矛盾有时会让我觉得值得继续思考。" },
+            
+            // Section 3
+            { id: 11, section: 3, text: "11. 我会追问自己为什么会形成某个判断。" },
+            { id: 12, section: 3, text: "12. 我能区分“发生了什么”“我如何解释它”和“我对此有什么感受”。" },
+            { id: 13, section: 3, text: "13. 我发现自己可能误判时，通常愿意修正。" },
+            { id: 14, section: 3, text: "14. 情绪强烈时，我仍能部分观察自己正在经历什么。" },
+            { id: 15, section: 3, text: "15. 我会反思自己说某句话真正想达到什么效果。" },
+            
+            // Section 4
+            { id: 16, section: 4, text: "16. 对重要决定，我希望主要依据自己的判断作出选择。" },
+            { id: 17, section: 4, text: "17. 我不喜欢别人替我定义我的感受、身份或选择。" },
+            { id: 18, section: 4, text: "18. 当我不想继续某种互动时，我通常能够表达拒绝。" },
+            { id: 19, section: 4, text: "19. 即使关系亲近，我也需要保留一定私人空间。" },
+            { id: 20, section: 4, text: "20. 为维持关系而不得不压下真实想法时，我会明显感到不适。" },
+            
+            // Section 5
+            { id: 21, section: 5, text: "21. 环境中的感官刺激，例如噪音、光线或拥挤程度，会明显影响我的状态。" },
+            { id: 22, section: 5, text: "22. 我容易察觉他人语气、停顿或用词中的细微变化。" },
+            { id: 23, section: 5, text: "23. 面对难以直说的感受时，我更可能使用比喻、玩笑或含蓄表达。" },
+            { id: 24, section: 5, text: "24. 我会根据对象和情境明显调整自己的表达方式。" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderRatingQuestions();
+            attachInputListeners();
+            updateCounters();
+        });
+
+        // Render standard 1-7 rating questions
+        function renderRatingQuestions() {
+            ratingQuestions.forEach(q => {
+                const container = document.getElementById(`q-container-${q.section}`);
+                if (!container) return;
+
+                const card = document.createElement('div');
+                card.id = `q-box-${q.id}`;
+                card.className = "q-card p-4 rounded-xl transition-all duration-200 hover:bg-eggshell/50 border border-transparent";
+
+                let optionsHtml = '';
+                for (let v = 1; v <= 7; v++) {
+                    optionsHtml += `
+                        <div class="rating-btn flex-1 text-center">
+                            <input type="radio" id="q${q.id}_val${v}" name="q_${q.id}" value="${v}" class="sr-only">
+                            <label for="q${q.id}_val${v}" class="block py-2.5 text-xs sm:text-sm font-semibold text-sage-800 bg-eggshell/70 rounded-xl border border-eggshell-border cursor-pointer transition-all duration-150 select-none hover:bg-sage-100">
+                                ${v}
+                            </label>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <p class="text-sm md:text-base font-medium text-charcoal mb-3">${q.text}</p>
+                    <div class="rating-group flex items-center justify-between gap-1.5 sm:gap-2" data-q="${q.id}">
+                        ${optionsHtml}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Attach listeners for live counter updates and error clearing
+        function attachInputListeners() {
+            // Rating inputs
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const qId = e.target.name.replace('q_', '');
+                    const qCard = document.getElementById(`q-box-${qId}`);
+                    if (qCard) {
+                        qCard.classList.remove('incomplete-highlight');
+                    }
+                    updateCounters();
+                });
+            });
+
+            // Open text inputs
+            document.querySelectorAll('.open-input').forEach(textarea => {
+                textarea.addEventListener('input', (e) => {
+                    const parentCard = e.target.closest('.q-card');
+                    if (parentCard) {
+                        parentCard.classList.remove('incomplete-highlight');
+                    }
+                    updateCounters();
+                });
+            });
+        }
+
+        function updateCounters() {
+            // Sections 1 to 5
+            for (let sec = 1; sec <= 5; sec++) {
+                const secQuestions = ratingQuestions.filter(q => q.section === sec);
+                let answered = 0;
+                secQuestions.forEach(q => {
+                    if (document.querySelector(`input[name="q_${q.id}"]:checked`)) {
+                        answered++;
+                    }
+                });
+                const counterEl = document.getElementById(`sec-${sec}-counter`);
+                if (counterEl) counterEl.textContent = answered;
+            }
+
+            // Section 6 (Open tasks)
+            let openAnswered = 0;
+            ['o1', 'o2', 'o3', 'o4'].forEach(id => {
+                const val = document.getElementById(`input-${id}`)?.value.trim();
+                if (val && val.length > 0) openAnswered++;
+            });
+            const sec6Counter = document.getElementById('sec-6-counter');
+            if (sec6Counter) sec6Counter.textContent = openAnswered;
+        }
+
+        function handleFormSubmission() {
+            let firstUnansweredBox = null;
+            let missingCount = 0;
+
+            // Check rating questions
+            ratingQuestions.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const box = document.getElementById(`q-box-${q.id}`);
+                if (!checked) {
+                    missingCount++;
+                    if (box) box.classList.add('incomplete-highlight');
+                    if (!firstUnansweredBox) firstUnansweredBox = box;
+                } else {
+                    if (box) box.classList.remove('incomplete-highlight');
+                }
+            });
+
+            // Check open-ended questions
+            ['o1', 'o2', 'o3', 'o4'].forEach(id => {
+                const textEl = document.getElementById(`input-${id}`);
+                const box = document.getElementById(`q-box-${id}`);
+                if (!textEl || !textEl.value.trim()) {
+                    missingCount++;
+                    if (box) box.classList.add('incomplete-highlight');
+                    if (!firstUnansweredBox) firstUnansweredBox = box;
+                } else {
+                    if (box) box.classList.remove('incomplete-highlight');
+                }
+            });
+
+            if (firstUnansweredBox) {
+                // Show toast alert
+                showToast(`尚有 ${missingCount} 道题目未解答，已为你定位到首个问题。`);
+                // Smooth scroll to first missing element
+                firstUnansweredBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // If valid, calculate and generate report
+            generateReport();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = msg;
+            toast.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        function generateReport() {
+            // Extract ratings
+            const scores = {};
+            ratingQuestions.forEach(q => {
+                const el = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                scores[q.id] = parseInt(el.value, 10);
+            });
+
+            // Calculate 4 core indices
+            // M1: 概念探索 Q1..Q5
+            const m1 = (scores[1] + scores[2] + scores[3] + scores[4] + scores[5]) / 5;
+            
+            // M2: 不确定性容纳 RQ6, RQ7, Q8, Q9, Q10 (r6 = 8-x6, r7 = 8-x7)
+            const r6 = 8 - scores[6];
+            const r7 = 8 - scores[7];
+            const m2 = (r6 + r7 + scores[8] + scores[9] + scores[10]) / 5;
+            
+            // M3: 反思性监控 Q11..Q15
+            const m3 = (scores[11] + scores[12] + scores[13] + scores[14] + scores[15]) / 5;
+            
+            // M4: 自主性与边界 Q16..Q20
+            const m4 = (scores[16] + scores[17] + scores[18] + scores[19] + scores[20]) / 5;
+
+            // Check internal tension per module (max - min >= 4)
+            const tension1 = (Math.max(scores[1], scores[2], scores[3], scores[4], scores[5]) - Math.min(scores[1], scores[2], scores[3], scores[4], scores[5])) >= 4;
+            const tension2 = (Math.max(r6, r7, scores[8], scores[9], scores[10]) - Math.min(r6, r7, scores[8], scores[9], scores[10])) >= 4;
+            const tension3 = (Math.max(scores[11], scores[12], scores[13], scores[14], scores[15]) - Math.min(scores[11], scores[12], scores[13], scores[14], scores[15])) >= 4;
+            const tension4 = (Math.max(scores[16], scores[17], scores[18], scores[19], scores[20]) - Math.min(scores[16], scores[17], scores[18], scores[19], scores[20])) >= 4;
+
+            // Open text inputs
+            const o1Text = document.getElementById('input-o1').value.trim();
+            const o2Text = document.getElementById('input-o2').value.trim();
+            const o3Text = document.getElementById('input-o3').value.trim();
+            const o4Text = document.getElementById('input-o4').value.trim();
+
+            // Populate Witty Summary Verdict
+            renderWittyVerdict(m1, m2, m3, m4);
+
+            // Populate 4 indices DOM
+            renderCoreIndices(m1, m2, m3, m4, [tension1, tension2, tension3, tension4]);
+
+            // Populate Section 5 Behavioral Cues
+            renderBehavioralCues(scores);
+
+            // Populate Section 6 Open Task Analysis
+            renderOpenTaskAnalysis(o1Text, o2Text, o3Text, o4Text);
+
+            // Generate AI Persona Export Prompt
+            renderAiPrompt(m1, m2, m3, m4, scores, { o1Text, o2Text, o3Text, o4Text });
+
+            // Hide form & reveal result container
+            document.getElementById('questionnaire-form').classList.add('hidden');
+            const resContainer = document.getElementById('result-container');
+            resContainer.classList.remove('hidden');
+            document.getElementById('report-date').textContent = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Scroll to top of results
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderWittyVerdict(m1, m2, m3, m4) {
+            let title = "";
+            let summary = "";
+
+            if (m1 >= 5.0 && m3 >= 5.0 && m4 >= 5.0) {
+                title = "【高维哲思 + 清醒触角型】脑内常驻哲学家与独立观察员";
+                summary = "你的精神世界像是一间自带降噪与高倍显微镜的独立工作室。你既擅长将琐碎日常抽象为深邃的规律，又在人际关系里保持着清晰不妥协的边界。你习惯站在高处俯瞰自己的情绪，偶有纠结也是因为看到了太多层面的真相。";
+            } else if (m2 >= 5.0 && m3 >= 5.0) {
+                title = "【从容包容 + 深度元认知型】高灵活性智慧探索者";
+                summary = "你拥有极佳的认知韧性，面对复杂模糊的情境不会慌乱收束，而是能安然留白。你对内在动机的洞察敏锐且包容，就像一位通达的倾听者，在变化万千的世界里总能找到从容的平衡点。";
+            } else if (m4 >= 5.2 && m2 < 4.0) {
+                title = "【主导果断 + 明确边界型】行动主义护航者";
+                summary = "你是一个极度看重自主决定权的人，不喜欢拖泥带水或沉溺于模棱两可。你的界限清晰利落，知道自己要什么，也善于在嘈杂的环境中迅速锁定答案并守护个人的精神领地。";
+            } else {
+                title = "【多维交织 + 情境感知型】独特而灵动的观察者";
+                summary = "你的认知与心理图谱呈现出鲜活的丰富度。你不在固定范式中安顿自己，而是在概念思考、人际边界与自我反思之间灵活转换。不同的情境会唤醒你不同的面貌，展现出高度的情境适应力。";
+            }
+
+            document.getElementById('witty-title').textContent = title;
+            document.getElementById('witty-summary').textContent = summary;
+        }
+
+        function renderCoreIndices(m1, m2, m3, m4, tensions) {
+            const getRangeTag = (val) => {
+                if (val >= 5.0) return { text: "较常认同 (5.0–7.0)", class: "bg-sage-100 text-sage-800" };
+                if (val >= 3.0) return { text: "混合/情境依赖 (3.0–4.9)", class: "bg-butter-100 text-amber-800" };
+                return { text: "较少认同 (1.0–2.9)", class: "bg-gray-100 text-gray-700" };
+            };
+
+            const indices = [
+                { name: "一、概念探索与抽象倾向", val: m1, tension: tensions[0], desc: "反映日常思考中追寻内在模式、抽象意义与接纳新概念的自述倾向。" },
+                { name: "二、不确定性容纳与认知灵活性", val: m2, tension: tensions[1], desc: "反映对未知、模糊或无明确答案状态的心理耐受度与保留判断能力。" },
+                { name: "三、反思性监控", val: m3, tension: tensions[2], desc: "反映对自身认知过程、情绪状态以及说话动机的元认知觉察程度。" },
+                { name: "四、自主性与边界", val: m4, tension: tensions[3], desc: "反映在重要决定、人际互动及私人空间中维持自我独立性的意愿。" }
+            ];
+
+            const grid = document.getElementById('indices-grid');
+            grid.innerHTML = '';
+
+            indices.forEach(idx => {
+                const tag = getRangeTag(idx.val);
+                const pct = ((idx.val - 1) / 6 * 100).toFixed(1);
+
+                const card = document.createElement('div');
+                card.className = "p-5 rounded-xl bg-eggshell/60 border border-eggshell-border flex flex-col justify-between space-y-3";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-charcoal text-base">${idx.name}</h4>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold ${tag.class}">${tag.text}</span>
+                        </div>
+                        <p class="text-xs text-muted mb-4">${idx.desc}</p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-baseline justify-between mb-1.5">
+                            <span class="text-xs font-semibold text-muted">指数得分</span>
+                            <span class="serif-title text-2xl font-bold text-sage-800">${idx.val.toFixed(2)} <span class="text-xs font-normal text-muted">/ 7.00</span></span>
+                        </div>
+                        <div class="w-full h-2.5 bg-eggshell-border rounded-full overflow-hidden">
+                            <div class="h-full bg-sage-600 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                        ${idx.tension ? `
+                            <p class="text-[11px] text-amber-700 mt-2.5 flex items-center space-x-1 bg-butter-50 p-1.5 rounded border border-butter-200">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>存在明显的情境差异或内部张力（差值≥4），宜结合具体场景解释。</span>
+                            </p>
+                        ` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderBehavioralCues(scores) {
+            const cues = [
+                { id: 21, score: scores[21], name: "Q21. 感官—环境敏感度", desc: "环境光线、噪音与拥挤度对内在状态的调控影响。" },
+                { id: 22, score: scores[22], name: "Q22. 人际线索察觉倾向", desc: "对他人语气、停顿与言外之意的捕捉灵敏度。" },
+                { id: 23, score: scores[23], name: "Q23. 隐喻与含蓄表达偏好", desc: "面对微妙感受时，使用比喻、玩笑或迂回表达的倾向。" },
+                { id: 24, score: scores[24], name: "Q24. 情境化语言风格调节", desc: "根据交流对象与场合主动调整表达策略的弹性。" }
+            ];
+
+            const grid = document.getElementById('behavioral-cues-grid');
+            grid.innerHTML = '';
+
+            cues.forEach(c => {
+                let levelText = c.score >= 5 ? "信号较强" : (c.score >= 3 ? "信号中等" : "信号较弱");
+                let levelClass = c.score >= 5 ? "text-sage-700 bg-sage-100" : "text-muted bg-eggshell";
+
+                const card = document.createElement('div');
+                card.className = "p-4 rounded-xl bg-eggshell/40 border border-eggshell-border flex items-start justify-between space-x-3";
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-sm text-charcoal">${c.name}</span>
+                        </div>
+                        <p class="text-xs text-muted">${c.desc}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="serif-title text-xl font-bold text-sage-800">${c.score}</span>
+                        <span class="block text-[10px] font-semibold px-2 py-0.5 rounded ${levelClass} mt-0.5">${levelText}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderOpenTaskAnalysis(o1, o2, o3, o4) {
+            const container = document.getElementById('open-text-analysis-container');
+            container.innerHTML = '';
+
+            // Simple rule-based heuristics to identify features in Chinese text
+            const hasAbstraction = /抽象|意义|本质|规律|底层|认知|逻辑|思考|反思|角度/i.test(o1 + o4);
+            const hasMultiPerspective = /或者|可能|或许|也可能|一方面|另一方面|也许|或者说/i.test(o1 + o2);
+            const hasSensoryDetails = /光|影|色|声|质感|气味|空间|线条|安静|温暖|温度|触感|风/i.test(o3);
+            const hasDirectBoundary = /不|拒绝|界限|开心|尊重|关你|没有必要|每个人|自己/i.test(o4);
+
+            const items = [
+                { title: "O1. 认知转折事件记录", text: o1, tags: [hasAbstraction ? "概念抽象" : "具体事实描绘", "视角重构"] },
+                { title: "O2. 不确定人际事件归因", text: o2, tags: [hasMultiPerspective ? "多重归因假设" : "单一归因", "情绪预警"] },
+                { title: "O3. 审美体验与空间感知", text: o3, tags: [hasSensoryDetails ? "丰富感官锚定" : "整体意象描述", "审美审视"] },
+                { title: "O4. 沟通应对与观念交互", text: o4, tags: [hasDirectBoundary ? "直接立场表达" : "温和回应", "认知边界"] }
+            ];
+
+            items.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = "p-4 rounded-xl bg-eggshell/50 border border-eggshell-border space-y-2";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-xs text-sage-800">${item.title}</span>
+                        <div class="flex space-x-1.5">
+                            ${item.tags.map(t => `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-butter-100 text-amber-900 border border-butter-200">${t}</span>`).join('')}
+                        </div>
+                    </div>
+                    <p class="text-xs text-charcoal bg-white/80 p-3 rounded-lg border border-eggshell-border italic font-serif">“ ${item.text} ”</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAiPrompt(m1, m2, m3, m4, scores, openTexts) {
+            const getLevel = (v) => v >= 5.0 ? "较突出" : (v >= 3.0 ? "混合/情境依赖" : "较低");
+            const getUncertaintyStyle = (v) => v >= 5.0 ? "较能保留多重解释与悬疑" : (v >= 3.0 ? "视情境保留判断" : "倾向迅速闭合收束");
+            const getBoundaryStyle = (v) => m4 >= 5.0 ? "直接且尊重独立边界" : "委婉包容";
+
+            const promptText = `[AI 系统角色配置指令 / Persona Configuration]
+
+画像证据等级：
+- 强：量化指标与开放文本在抽象度、元认知及人际边界表现高度一致。
+
+AI 风格配置参数：
+1. 概念探索倾向：${getLevel(m1)} (得分: ${m1.toFixed(2)})
+2. 对不确定性的处理：${getUncertaintyStyle(m2)} (得分: ${m2.toFixed(2)})
+3. 自我反思表达：${getLevel(m3)} (得分: ${m3.toFixed(2)})
+4. 边界表达取向：${getBoundaryStyle(m4)} (得分: ${m4.toFixed(2)})
+5. 单项行为线索信号：
+   - 感官-环境影响: ${scores[21]}/7
+   - 人际细微察觉: ${scores[22]}/7
+   - 比喻/含蓄表达: ${scores[23]}/7
+   - 情境表达调节: ${scores[24]}/7
+
+对话与交互原则：
+- 在交流中保持对多重解释与深层逻辑的敏锐度，避免提供简单化的说教。
+- 尊重受试者的个人私人空间与独立判断，不强行定义其感受或心理状态。
+- 可以使用更富意象、具象或比喻色彩的语言，契合受试者的审美感知偏好。
+
+[免责声明]
+以上为一次自陈和有限文本样本形成的风格假设。回应时可体现已获支持的表达偏好，但不得把不确定特征当作事实，不得声称了解该人的真实心理状态。`;
+
+            document.getElementById('ai-prompt-box').textContent = promptText;
+        }
+
+        function copyAiPrompt() {
+            const promptText = document.getElementById('ai-prompt-box').textContent;
+            
+            // Fallback execCommand for iframe safety
+            const textInput = document.createElement('textarea');
+            textInput.value = promptText;
+            document.body.appendChild(textInput);
+            textInput.select();
+            try {
+                document.execCommand('copy');
+                showToast("AI 提示词已成功复制到剪贴板！");
+            } catch (err) {
+                showToast("复制失败，请手动选中文本复制。");
+            }
+            document.body.removeChild(textInput);
+        }
+
+        function resetForm() {
+            document.getElementById('questionnaire-form').reset();
+            document.querySelectorAll('.incomplete-highlight').forEach(el => el.classList.remove('incomplete-highlight'));
+            updateCounters();
+
+            document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('questionnaire-form').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
